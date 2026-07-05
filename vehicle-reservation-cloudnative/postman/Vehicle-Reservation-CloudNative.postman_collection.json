@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Vehicle Reservation Cloud Native",
+    "description": "Reto 5 - Microservicio de reservación de vehículos (Quarkus). REST, CDI, Panache, Mutiny, gRPC, Health Checks, Métricas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:18080" }
+  ],
+  "item": [
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "List all vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "[\n  { \"id\": 1, \"plate\": \"ABC123\", \"type\": \"SEDAN\", \"capacity\": 4, \"available\": true },\n  { \"id\": 2, \"plate\": \"XYZ789\", \"type\": \"SUV\", \"capacity\": 6, \"available\": true },\n  { \"id\": 3, \"plate\": \"VAN456\", \"type\": \"VAN\", \"capacity\": 12, \"available\": false }\n]"
+            }
+          ]
+        },
+        {
+          "name": "List available vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/available"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "[\n  { \"id\": 1, \"plate\": \"ABC123\", \"type\": \"SEDAN\", \"capacity\": 4, \"available\": true },\n  { \"id\": 2, \"plate\": \"XYZ789\", \"type\": \"SUV\", \"capacity\": 6, \"available\": true }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get vehicle by id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/1"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{ \"id\": 1, \"plate\": \"ABC123\", \"type\": \"SEDAN\", \"capacity\": 4, \"available\": true }"
+            },
+            { "name": "404 Not Found", "body": "" }
+          ]
+        },
+        {
+          "name": "Create vehicle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"NEW111\",\n  \"type\": \"SEDAN\",\n  \"capacity\": 5,\n  \"available\": true\n}"
+            },
+            "url": "{{baseUrl}}/vehicles"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "body": "{ \"id\": 4, \"plate\": \"NEW111\", \"type\": \"SEDAN\", \"capacity\": 5, \"available\": true }"
+            }
+          ]
+        },
+        {
+          "name": "Change vehicle availability",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/vehicles/1/availability/false"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{ \"id\": 1, \"plate\": \"ABC123\", \"type\": \"SEDAN\", \"capacity\": 4, \"available\": false }"
+            },
+            { "name": "404 Not Found", "body": "" }
+          ]
+        },
+        {
+          "name": "Reactive recommendations (Mutiny)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/reactive/recommendations"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "[\n  { \"id\": 2, \"plate\": \"XYZ789\", \"type\": \"SUV\", \"capacity\": 6, \"available\": true },\n  { \"id\": 1, \"plate\": \"ABC123\", \"type\": \"SEDAN\", \"capacity\": 4, \"available\": true }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "List all reservations",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "[\n  {\n    \"id\": 1,\n    \"vehicleId\": 1,\n    \"customerName\": \"Jordy Ramirez\",\n    \"startDate\": \"2026-07-10\",\n    \"endDate\": \"2026-07-12\",\n    \"status\": \"PENDING\",\n    \"createdAt\": \"2026-07-05T10:00:00\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get reservation by id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations/1" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{\n  \"id\": 1,\n  \"vehicleId\": 1,\n  \"customerName\": \"Jordy Ramirez\",\n  \"startDate\": \"2026-07-10\",\n  \"endDate\": \"2026-07-12\",\n  \"status\": \"PENDING\"\n}"
+            },
+            { "name": "404 Not Found", "body": "" }
+          ]
+        },
+        {
+          "name": "Create reservation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": 1,\n  \"customerName\": \"Jordy Ramirez\",\n  \"startDate\": \"2026-07-10\",\n  \"endDate\": \"2026-07-12\"\n}"
+            },
+            "url": "{{baseUrl}}/reservations"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "body": "{ \"id\": 1, \"vehicleId\": 1, \"customerName\": \"Jordy Ramirez\", \"startDate\": \"2026-07-10\", \"endDate\": \"2026-07-12\", \"status\": \"PENDING\" }"
+            },
+            { "name": "409 Conflict - vehicle not available", "body": "Vehicle 1 is not available" },
+            { "name": "404 Not Found - vehicle does not exist", "body": "Vehicle not found: 99" }
+          ]
+        },
+        {
+          "name": "Confirm reservation",
+          "request": { "method": "PUT", "url": "{{baseUrl}}/reservations/1/confirm" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{ \"id\": 1, \"vehicleId\": 1, \"status\": \"CONFIRMED\" }"
+            }
+          ]
+        },
+        {
+          "name": "Cancel reservation",
+          "request": { "method": "PUT", "url": "{{baseUrl}}/reservations/1/cancel" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{ \"id\": 1, \"vehicleId\": 1, \"status\": \"CANCELLED\" }"
+            }
+          ]
+        },
+        {
+          "name": "Complete reservation",
+          "request": { "method": "PUT", "url": "{{baseUrl}}/reservations/1/complete" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{ \"id\": 1, \"vehicleId\": 1, \"status\": \"COMPLETED\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Observability",
+      "item": [
+        {
+          "name": "Health (general)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/health" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "{\n  \"status\": \"UP\",\n  \"checks\": [\n    { \"name\": \"vehicle-reservation-liveness\", \"status\": \"UP\" },\n    { \"name\": \"vehicle-database-connection\", \"status\": \"UP\", \"data\": { \"vehicles\": 3 } }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Health - Liveness",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/health/live" }
+        },
+        {
+          "name": "Health - Readiness",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/health/ready" }
+        },
+        {
+          "name": "Metrics (Prometheus)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/metrics" },
+          "response": [
+            {
+              "name": "200 OK",
+              "body": "# HELP vehicles_created_count_total\n# TYPE vehicles_created_count_total counter\nvehicles_created_count_total 1.0\n# HELP vehicles_list_timer_seconds\n# TYPE vehicles_list_timer_seconds summary\nvehicles_list_timer_seconds_count 5.0"
+            }
+          ]
+        },
+        {
+          "name": "OpenAPI spec",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/openapi" }
+        },
+        {
+          "name": "Swagger UI",
+          "request": { "method": "GET", "url": "{{baseUrl}}/q/swagger-ui" }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.anahuac.grpc";
+option java_multiple_files = true;
+
+package vehicle;
+
+service VehicleGrpcService {
+  rpc GetVehicle (VehicleRequest) returns (VehicleReply);
+}
+
+message VehicleRequest {
+  int64 id = 1;
+}
+
+message VehicleReply {
+  int64 id = 1;
+  string plate = 2;
+  string type = 3;
+  int32 capacity = 4;
+  bool available = 5;
+}
