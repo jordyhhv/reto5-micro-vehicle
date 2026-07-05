@@ -3,10 +3,7 @@
 Microservicio Quarkus de reservación de vehículos. Cubre las 10 tareas del reto:
 REST, CDI, Panache, Mutiny, gRPC, Health Checks, Métricas, GraalVM Native Image, Docker, Kubernetes con Kind.
 
-> **Nota**: el PDF original del reto tenía varias páginas sin texto extraíble (probablemente
-> capturas de pantalla). Este proyecto reconstruye el código visible (VehicleResource,
-> VehicleGrpcServiceImpl, comandos) y completa lo faltante (entidad Reservation, health checks,
-> métricas, manifiestos de Kubernetes/Kind) con supuestos razonables — ajusta según tu enunciado real.
+
 
 ## 1. Requisitos previos
 
